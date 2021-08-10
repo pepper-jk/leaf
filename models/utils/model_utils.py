@@ -28,6 +28,7 @@ def batch_data(data, batch_size, seed):
 
 def read_dir(data_dir):
     clients = []
+    num_samples = {}
     groups = []
     data = defaultdict(lambda : None)
 
@@ -38,12 +39,19 @@ def read_dir(data_dir):
         with open(file_path, 'r') as inf:
             cdata = json.load(inf)
         clients.extend(cdata['users'])
+        for client, samples in zip(cdata['users'], cdata['num_samples']):
+            if client in num_samples.keys():
+                print("client {} duplicate".format(client))
+                samples += num_samples[client]
+            num_samples.update({client: samples})
         if 'hierarchies' in cdata:
             groups.extend(cdata['hierarchies'])
         data.update(cdata['user_data'])
 
     clients = list(sorted(data.keys()))
-    return clients, groups, data
+    num_samples = [num_samples[client] for client in clients]
+
+    return clients, groups, data, num_samples
 
 
 def read_data(train_data_dir, test_data_dir):
@@ -60,8 +68,8 @@ def read_data(train_data_dir, test_data_dir):
         train_data: dictionary of train data
         test_data: dictionary of test data
     '''
-    train_clients, train_groups, train_data = read_dir(train_data_dir)
-    test_clients, test_groups, test_data = read_dir(test_data_dir)
+    train_clients, train_groups, train_data, train_samples = read_dir(train_data_dir)
+    test_clients, test_groups, test_data, test_samples = read_dir(test_data_dir)
 
     assert train_clients == test_clients
     assert train_groups == test_groups
