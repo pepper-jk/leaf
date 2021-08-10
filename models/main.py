@@ -15,7 +15,7 @@ from server import Server
 from model import ServerModel
 
 from utils.args import parse_args
-from utils.model_utils import read_data
+from utils.model_utils import read_data, read_dataset_pytorch
 
 STAT_METRICS_PATH = 'metrics/stat_metrics.csv'
 SYS_METRICS_PATH = 'metrics/sys_metrics.csv'
@@ -121,6 +121,8 @@ def setup_clients(dataset, model=None, use_val_set=False):
     eval_set = 'test' if not use_val_set else 'val'
     train_data_dir = os.path.join('..', 'data', dataset, 'data', 'train')
     test_data_dir = os.path.join('..', 'data', dataset, 'data', eval_set)
+
+    train_data, train_targets, train_samples, test_data, test_targets, test_samples = read_dataset_pytorch(train_data_dir, test_data_dir)
 
     users, groups, train_data, test_data = read_data(train_data_dir, test_data_dir)
 
