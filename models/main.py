@@ -33,7 +33,7 @@ def main():
     if not os.path.exists(model_path):
         print('Please specify a valid dataset and a valid model.')
     model_path = '%s.%s' % (args.dataset, args.model)
-    
+
     print('############################## %s ##############################' % model_path)
     mod = importlib.import_module(model_path)
     ClientModel = getattr(mod, 'ClientModel')
@@ -82,14 +82,14 @@ def main():
         # Simulate server model training on selected clients' data
         sys_metrics = server.train_model(num_epochs=args.num_epochs, batch_size=args.batch_size, minibatch=args.minibatch)
         sys_writer_fn(i + 1, c_ids, sys_metrics, c_groups, c_num_samples)
-        
+
         # Update server model
         server.update_model()
 
         # Test model
         if (i + 1) % eval_every == 0 or (i + 1) == num_rounds:
             print_stats(i + 1, server, clients, client_num_samples, args, stat_writer_fn, args.use_val_set)
-    
+
     # Save server model
     ckpt_path = os.path.join('checkpoints', args.dataset)
     if not os.path.exists(ckpt_path):
@@ -149,7 +149,7 @@ def get_sys_writer_function(args):
 
 def print_stats(
     num_round, server, clients, num_samples, args, writer, use_val_set):
-    
+
     train_stat_metrics = server.test_model(clients, set_to_use='train')
     print_metrics(train_stat_metrics, num_samples, prefix='train_')
     writer(num_round, train_stat_metrics, 'train')
