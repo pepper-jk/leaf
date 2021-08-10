@@ -50,10 +50,10 @@ def read_data(train_data_dir, test_data_dir):
     '''parses data in given train and test data directories
 
     assumes:
-    - the data in the input directories are .json files with 
+    - the data in the input directories are .json files with
         keys 'users' and 'user_data'
     - the set of train set users is the same as the set of test set users
-    
+
     Return:
         clients: list of client ids
         groups: list of group ids; empty list if none found
