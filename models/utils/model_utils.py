@@ -3,6 +3,8 @@ import numpy as np
 import os
 from collections import defaultdict
 
+import torch
+
 
 def batch_data(data, batch_size, seed):
     '''
@@ -75,3 +77,65 @@ def read_data(train_data_dir, test_data_dir):
     assert train_groups == test_groups
 
     return train_clients, train_groups, train_data, test_data
+
+
+def convert_to_tensor(data, clients):
+    data_points = []
+    targets = []
+
+    for i, client in enumerate(clients):
+        samples = data[client]
+
+        data_points.extend([sample for sample in samples['x']]) # torch.Tensor(sample).reshape((28,28))
+        targets.extend(samples['y'])
+
+        if i > len(clients)/10:
+            break
+
+    print(type(data_points))
+    print(len(data_points))
+
+    print("num clients: ", len(clients))
+    print("num samples: ", len(data_points))
+    # print("data sample: ", data_points[0])
+    print("len:         ", len(data_points[0]))
+    print("target:      ", targets[0])
+
+    targets_t = torch.Tensor(targets)
+    targets = []
+
+    data_t = torch.Tensor(data_points)
+    data_points = []
+    data_t = data_t.reshape((len(data_t),28,28))
+
+    print("sample data:   ", data_t[0])
+    print("type:          ", type(data_t[0]))
+    print("lenx:          ", len(data_t[0]))
+    print("leny:          ", len(data_t[0][0]))
+    print("sample target: ", targets_t[0])
+    print("type:          ", type(targets_t[0]))
+
+    return data_t, targets_t
+
+
+def read_data_pytorch(data_dir):
+    clients, groups, data, samples = read_dir(data_dir)
+    data, targets = convert_to_tensor(data, clients)
+    samples = torch.Tensor(samples)
+
+    print(len(samples))
+    print(samples[0:5])
+
+    return data, targets, samples
+
+
+def read_dataset_pytorch(train_data_dir, test_data_dir):
+    train_data, train_targets, train_samples = read_data_pytorch(train_data_dir)
+    test_data, test_targets, test_samples = read_data_pytorch(test_data_dir)
+
+    torch.save((train_data, train_targets, train_samples), train_data_dir+"/../train.pt")
+    torch.save((test_data, test_targets, test_samples), train_data_dir+"/../test.pt")
+
+    exit()
+
+    return train_data, train_targets, train_samples, test_data, test_targets, test_samples
