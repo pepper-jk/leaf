@@ -89,9 +89,6 @@ def convert_to_tensor(data, clients):
         data_points.extend([sample for sample in samples['x']]) # torch.Tensor(sample).reshape((28,28))
         targets.extend(samples['y'])
 
-        if i > len(clients)/10:
-            break
-
     print(type(data_points))
     print(len(data_points))
 
