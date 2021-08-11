@@ -105,7 +105,7 @@ def convert_to_tensor(data, clients):
     data_points = []
     data_t = data_t.reshape((len(data_t),28,28))
 
-    print("sample data:   ", data_t[0])
+    # print("sample data:   ", data_t[0])
     print("type:          ", type(data_t[0]))
     print("lenx:          ", len(data_t[0]))
     print("leny:          ", len(data_t[0][0]))
