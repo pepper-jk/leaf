@@ -101,7 +101,7 @@ def convert_to_tensor(data, clients):
     print("len:         ", len(data_points[0]))
     print("target:      ", targets[0])
 
-    targets_t = torch.Tensor(targets)
+    targets_t = torch.IntTensor(targets)
     targets = []
 
     data_t = torch.Tensor(data_points)
@@ -121,7 +121,6 @@ def convert_to_tensor(data, clients):
 def read_data_pytorch(data_dir):
     clients, groups, data, samples = read_dir(data_dir)
     data, targets = convert_to_tensor(data, clients)
-    samples = torch.Tensor(samples)
 
     print(len(samples))
     print(samples[0:5])
