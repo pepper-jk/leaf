@@ -43,62 +43,8 @@ def main():
     eval_every = args.eval_every if args.eval_every != -1 else tup[1]
     clients_per_round = args.clients_per_round if args.clients_per_round != -1 else tup[2]
 
-    # Suppress tf warnings
-    tf.logging.set_verbosity(tf.logging.WARN)
-
-    # Create 2 models
-    model_params = MODEL_PARAMS[model_path]
-    if args.lr != -1:
-        model_params_list = list(model_params)
-        model_params_list[0] = args.lr
-        model_params = tuple(model_params_list)
-
-    # Create client model, and share params with server model
-    tf.reset_default_graph()
-    client_model = ClientModel(args.seed, *model_params)
-
-    # Create server
-    server = Server(client_model)
-
     # Create clients
-    clients = setup_clients(args.dataset, client_model, args.use_val_set)
-    client_ids, client_groups, client_num_samples = server.get_clients_info(clients)
-    print('Clients in Total: %d' % len(clients))
-
-    # Initial status
-    print('--- Random Initialization ---')
-    stat_writer_fn = get_stat_writer_function(client_ids, client_groups, client_num_samples, args)
-    sys_writer_fn = get_sys_writer_function(args)
-    print_stats(0, server, clients, client_num_samples, args, stat_writer_fn, args.use_val_set)
-
-    # Simulate training
-    for i in range(num_rounds):
-        print('--- Round %d of %d: Training %d Clients ---' % (i + 1, num_rounds, clients_per_round))
-
-        # Select clients to train this round
-        server.select_clients(i, online(clients), num_clients=clients_per_round)
-        c_ids, c_groups, c_num_samples = server.get_clients_info(server.selected_clients)
-
-        # Simulate server model training on selected clients' data
-        sys_metrics = server.train_model(num_epochs=args.num_epochs, batch_size=args.batch_size, minibatch=args.minibatch)
-        sys_writer_fn(i + 1, c_ids, sys_metrics, c_groups, c_num_samples)
-
-        # Update server model
-        server.update_model()
-
-        # Test model
-        if (i + 1) % eval_every == 0 or (i + 1) == num_rounds:
-            print_stats(i + 1, server, clients, client_num_samples, args, stat_writer_fn, args.use_val_set)
-
-    # Save server model
-    ckpt_path = os.path.join('checkpoints', args.dataset)
-    if not os.path.exists(ckpt_path):
-        os.makedirs(ckpt_path)
-    save_path = server.save_model(os.path.join(ckpt_path, '{}.ckpt'.format(args.model)))
-    print('Model saved in path: %s' % save_path)
-
-    # Close models
-    server.close_model()
+    clients = setup_clients(args.dataset, None, args.use_val_set)
 
 def online(clients):
     """We assume all users are always online."""
