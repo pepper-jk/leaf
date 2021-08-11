@@ -132,7 +132,7 @@ def read_dataset_pytorch(train_data_dir, test_data_dir):
     train_data, train_targets, train_samples = read_data_pytorch(train_data_dir)
     test_data, test_targets, test_samples = read_data_pytorch(test_data_dir)
 
-    torch.save((train_data, train_targets, train_samples), train_data_dir+"/../train.pt")
+    torch.save((train_data, train_targets, train_samples), train_data_dir+"/../training.pt")
     torch.save((test_data, test_targets, test_samples), train_data_dir+"/../test.pt")
 
     exit()
